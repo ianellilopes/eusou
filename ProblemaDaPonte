@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travessia do Rio</title>
+</head>
+<body>
+
+<script>
+function travessia() {
+    // Função para resolver o problema da travessia
+
+    // Estado inicial e estado final
+    var estadoInicial = [0, 0, 0, 0]; // [margem1_h, margem1_l, margem1_c, margem1_a]
+    var estadoFinal = [1, 1, 1, 1]; // [margem2_h, margem2_l, margem2_c, margem2_a]
+
+    // Função para verificar se o estado é válido
+    function isValid(estado) {
+        if ((estado[1] == 1 && estado[2] == 1) || (estado[1] == 1 && estado[3] == 1)) {
+            return false; // lobo e cabra juntos
+        }
+        if ((estado[1] == 1 && estado[3] == 1) || (estado[1] == 1 && estado[4] == 1)) {
+            return false; // cabra e alfafa juntos
+        }
+        return true;
+    }
+
+    // Função para obter os vizinhos válidos de um estado
+    function getNeighbors(estado) {
+        var neighbors = [];
+        for (var i = 1; i < 5; i++) {
+            for (var j = i + 1; j < 5; j++) {
+                var newEstado = estado.slice(); // Copiar o estado atual
+                if (newEstado[i] == 0) {
+                    newEstado[0] = 0;
+                    newEstado[i] = 1;
+                    if (isValid(newEstado)) {
+                        neighbors.push(newEstado);
+                    }
+                } else {
+                    newEstado[0] = 1;
+                    newEstado[i] = 0;
+                    if (isValid(newEstado)) {
+                        neighbors.push(newEstado);
+                    }
+                }
+                if (newEstado[j] == 0) {
+                    newEstado[0] = 0;
+                    newEstado[j] = 1;
+                    if (isValid(newEstado)) {
+                        neighbors.push(newEstado);
+                    }
+                } else {
+                    newEstado[0] = 1;
+                    newEstado[j] = 0;
+                    if (isValid(newEstado)) {
+                        neighbors.push(newEstado);
+                    }
+                }
+            }
+        }
+        return neighbors;
+    }
+
+    // Busca em largura
+    var frontier = [[estadoInicial, []]]; // [estado, ação]
+    var explored = new Set();
+    while (frontier.length > 0) {
+        var [estadoAtual, acoes] = frontier.shift();
+        if (estadoAtual.toString() == estadoFinal.toString()) {
+            return acoes;
+        }
+        explored.add(estadoAtual.toString());
+        var neighbors = getNeighbors(estadoAtual);
+        for (var i = 0; i < neighbors.length; i++) {
+            var neighbor = neighbors[i];
+            if (!explored.has(neighbor.toString())) {
+                frontier.push([neighbor, acoes.concat([neighbor])]);
+            }
+        }
+    }
+    return null;
+}
+
+// Executar o algoritmo e imprimir o resultado
+var resultado = travessia();
+var resultadoHTML = "<h2>Lista de ações para a travessia:</h2>";
+for (var i = 0; i < resultado.length; i++) {
+    resultadoHTML += "<p><strong>Passo " + (i + 1) + ":</strong> " + resultado[i] + "</p>";
+}
+document.body.innerHTML = resultadoHTML;
+</script>
+
+</body>
+</html>
